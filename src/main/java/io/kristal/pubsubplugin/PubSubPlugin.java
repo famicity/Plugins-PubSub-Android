@@ -29,9 +29,9 @@
 
 package io.kristal.pubsubplugin;
 
-import fr.cobaltians.cobalt.fragments.CobaltFragment;
-import fr.cobaltians.cobalt.plugin.CobaltAbstractPlugin;
-import fr.cobaltians.cobalt.plugin.CobaltPluginWebContainer;
+import org.cobaltians.cobalt.fragments.CobaltFragment;
+import org.cobaltians.cobalt.plugin.CobaltAbstractPlugin;
+import org.cobaltians.cobalt.plugin.CobaltPluginWebContainer;
 
 import android.util.Log;
 

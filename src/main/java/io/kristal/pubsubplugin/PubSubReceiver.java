@@ -29,7 +29,7 @@
 
 package io.kristal.pubsubplugin;
 
-import fr.cobaltians.cobalt.fragments.CobaltFragment;
+import org.cobaltians.cobalt.fragments.CobaltFragment;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.SimpleArrayMap;
