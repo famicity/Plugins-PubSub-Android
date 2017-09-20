@@ -51,7 +51,9 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 	private static final String TAG = PubSubReceiver.class.getSimpleName();
 
 	/**********************************************************************************************
+	 *
 	 * MEMBERS
+	 *
 	 **********************************************************************************************/
 
 	protected static PubSubPlugin sInstance;
@@ -59,20 +61,25 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 	/**
 	 * The array which keeps track of PubSubReceivers
 	 */
-	private ArrayList<PubSubReceiver> receivers = new ArrayList<>();
+	private ArrayList<PubSubReceiver> mReceivers = new ArrayList<>();
 
 	/**********************************************************************************************
+	 *
 	 * CONSTRUCTORS
+	 *
 	 **********************************************************************************************/
 
 	public static CobaltAbstractPlugin getInstance(CobaltPluginWebContainer webContainer) {
-		if (sInstance == null) sInstance = new PubSubPlugin();
-		sInstance.addWebContainer(webContainer);
+		if (sInstance == null) {
+			sInstance = new PubSubPlugin();
+		}
 		return sInstance;
 	}
 
     /**********************************************************************************************
+	 *
      * COBALT METHODS
+	 *
      **********************************************************************************************/
 
 	@Override
@@ -104,7 +111,9 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 	}
 
 	/**********************************************************************************************
+	 *
 	 * HELPERS
+	 *
 	 **********************************************************************************************/
 
 	/**
@@ -113,7 +122,7 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 	 * @param channel the channel to which broadcast the message.
 	 */
 	private void publishMessage(JSONObject message, String channel) {
-		for (PubSubReceiver receiver : receivers) {
+		for (PubSubReceiver receiver : new ArrayList<>(mReceivers)) {
 			receiver.receiveMessage(message, channel);
 		}
 	}
@@ -128,7 +137,7 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 	private void subscribeFragmentToChannel(CobaltFragment fragment, String channel, String callback) {
 		PubSubReceiver subscribingReceiver = null;
 
-		for (PubSubReceiver receiver : receivers) {
+		for (PubSubReceiver receiver : new ArrayList<>(mReceivers)) {
 			if (fragment.equals(receiver.getFragment())) {
 				subscribingReceiver = receiver;
 				break;
@@ -141,7 +150,7 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 		else {
 			subscribingReceiver = new PubSubReceiver(fragment, callback, channel);
 			subscribingReceiver.setListener(this);
-			receivers.add(subscribingReceiver);
+			mReceivers.add(subscribingReceiver);
 		}
 	}
 
@@ -154,7 +163,7 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 	private void unsubscribeFragmentFromChannel(CobaltFragment fragment, String channel) {
 		PubSubReceiver unsubscribingReceiver = null;
 
-		for (PubSubReceiver receiver : receivers) {
+		for (PubSubReceiver receiver : new ArrayList<>(mReceivers)) {
 			if (fragment.equals(receiver.getFragment())) {
 				unsubscribingReceiver = receiver;
 				break;
@@ -167,11 +176,13 @@ public final class PubSubPlugin extends CobaltAbstractPlugin implements PubSubIn
 	}
 
 	/**********************************************************************************************
-	 * PUBSUB INTERFACE
+	 *
+	 * RECEIVER LISTENER
+	 *
 	 **********************************************************************************************/
 
 	@Override
 	public void receiverReadyForRemove(PubSubReceiver receiver) {
-		receivers.remove(receiver);
+		mReceivers.remove(receiver);
 	}
 }

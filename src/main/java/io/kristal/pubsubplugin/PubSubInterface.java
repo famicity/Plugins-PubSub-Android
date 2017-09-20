@@ -30,14 +30,14 @@
 package io.kristal.pubsubplugin;
 
 /**
- * An Interface to implement to be notified when a PubSubReceiver fragment is nil (deallocated or not correctly initialized)
+ * An Interface to implement to be notified when a PubSubReceiver fragment is null (deallocated or not correctly initialized)
  * or a PubSubReceiver is not subscribed to any channel any more
  * @author Sébastien Vitard
  */
 public interface PubSubInterface {
 
     /**
-    * Notifies when a PubSubReceiver fragment is nil (deallocated or not correctly initialized)
+    * Notifies when a PubSubReceiver fragment is null (deallocated or not correctly initialized)
     * or a PubSubReceiver is not subscribed to any channel any more
     * @param receiver the PubSubReceiver
     */

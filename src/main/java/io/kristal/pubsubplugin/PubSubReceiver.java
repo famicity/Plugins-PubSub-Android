@@ -32,6 +32,7 @@ package io.kristal.pubsubplugin;
 import org.cobaltians.cobalt.fragments.CobaltFragment;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 
@@ -56,16 +57,16 @@ public class PubSubReceiver {
     /**
      * The dictionary which keeps track of subscribed channels and their linked callback
      */
-    private SimpleArrayMap<String, String> callbackForChannel;
+    private SimpleArrayMap<String, String> mCallbackForChannel;
     /**
      * The CobaltFragment containing the WebView to which send messages
      */
-    private WeakReference<CobaltFragment> fragmentReference = new WeakReference<>(null);
+    private WeakReference<CobaltFragment> mFragmentReference = new WeakReference<>(null);
     /**
-     * The listener to notify when the fragment is nil (deallocated or not correctly initialized)
+     * The listener to notify when the fragment is null (deallocated or not correctly initialized)
      * or the PubSubReceiver is not subscribed to any channel any more
      */
-    private PubSubInterface listener;
+    private PubSubInterface mListener;
 
     /***********************************************************************************************
      * METHODS
@@ -80,8 +81,8 @@ public class PubSubReceiver {
      * @param fragment the CobaltFragment containing the WebView to which send messages.
      */
     public PubSubReceiver(CobaltFragment fragment) {
-        fragmentReference = new WeakReference<CobaltFragment>(fragment);
-        callbackForChannel = new SimpleArrayMap<>();
+        mFragmentReference = new WeakReference<>(fragment);
+        mCallbackForChannel = new SimpleArrayMap<>();
     }
 
     /**
@@ -90,10 +91,10 @@ public class PubSubReceiver {
      * @param callback the callback to call to forward messages from the specified channel.
      * @param channel  the channel from which the messages will come from.
      */
-    public PubSubReceiver(CobaltFragment fragment, String callback, String channel) {
-        fragmentReference = new WeakReference<CobaltFragment>(fragment);
-        callbackForChannel = new SimpleArrayMap<>(1);
-        callbackForChannel.put(channel, callback);
+    public PubSubReceiver(CobaltFragment fragment, String callback, @NonNull String channel) {
+        mFragmentReference = new WeakReference<>(fragment);
+        mCallbackForChannel = new SimpleArrayMap<>(1);
+        mCallbackForChannel.put(channel, callback);
     }
 
     /***********************************************************************************************
@@ -104,17 +105,18 @@ public class PubSubReceiver {
      * Gets the CobaltFragment containing the WebView to which send messages
      * @return the CobaltFragment containing the WebView to which send messages
      */
+    @Nullable
     public CobaltFragment getFragment() {
-        return fragmentReference.get();
+        return mFragmentReference.get();
     }
 
     /**
-     * Sets the listener to notify when the fragment is nil (deallocated or not correctly initialized)
+     * Sets the listener to notify when the fragment is null (deallocated or not correctly initialized)
      * or the PubSubReceiver is not subscribed to any channel any more
      * @param listener the listener
      */
     public void setListener(PubSubInterface listener) {
-        this.listener = listener;
+        mListener = listener;
     }
 
     /***********************************************************************************************
@@ -129,7 +131,7 @@ public class PubSubReceiver {
      * @implNote overrides the callback if the PubSubReceiver has already subscribed to the specified channel
      */
     public void subscribeToChannel(@NonNull String channel, String callback) {
-        callbackForChannel.put(channel, callback);
+        mCallbackForChannel.put(channel, callback);
     }
 
     /**
@@ -139,12 +141,12 @@ public class PubSubReceiver {
      * @implNote if after the unsubscription, the PubSubReceiver is not subscribed to any channel and delegate is set,
      * its receiverReadyForRemove: method will be called.
      */
-    public void unsubscribeFromChannel(@NonNull String channel) {
-        callbackForChannel.remove(channel);
+    public void unsubscribeFromChannel(String channel) {
+        mCallbackForChannel.remove(channel);
 
-        if (callbackForChannel.isEmpty()
-            && listener != null) {
-            listener.receiverReadyForRemove(this);
+        if (mCallbackForChannel.isEmpty()
+            && mListener != null) {
+            mListener.receiverReadyForRemove(this);
         }
     }
 
@@ -153,24 +155,24 @@ public class PubSubReceiver {
      *
      * @param message the message received from the channel.
      * @param channel the channel from which the messages come from.
-     * @implNote if fragment is nil at this time, due to deallocation or wrong initialization,
+     * @implNote if fragment is null at this time, due to deallocation or wrong initialization,
      * and the delegate is set, its receiverReadyForRemove: method will be called.
      */
     public void receiveMessage(JSONObject message, @NonNull String channel) {
-        CobaltFragment fragment = fragmentReference.get();
+        CobaltFragment fragment = mFragmentReference.get();
         if (fragment == null) {
             Log.w(TAG, "receiveMessage - fragment is null. "
                         + "It may be caused by its deallocation or the PubSubReceiver was not correctly initialized... "
                         + "Please check if the PubSubReceiver has been initialized with PubSubReceiver(CobaltFragment) or PubSubReceiver(CobaltFragment, String, String) methods.");
 
-            if (listener != null) {
-                listener.receiverReadyForRemove(this);
+            if (mListener != null) {
+                mListener.receiverReadyForRemove(this);
             }
 
             return;
         }
 
-        String callback = callbackForChannel.get(channel);
+        String callback = mCallbackForChannel.get(channel);
         if (callback == null) {
             Log.w(TAG, "receiveMessage - " + fragment.getClass().getSimpleName() + "has not subscribed to " + channel + " channel yet or has already unsubscribed.");
             return;
